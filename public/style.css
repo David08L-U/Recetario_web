@@ -336,3 +336,57 @@ header { position: relative; }
 @media (max-width: 700px) {
   .idioma { position: static; justify-content: center; width: max-content; margin: 0 auto 1rem; }
 }
+
+/* ---------- NUEVO: Estados de error ---------- */
+.estado-error {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 2.5rem 1rem;
+  text-align: center;
+  color: var(--texto-suave);
+}
+
+.estado-error .icono { font-size: 2.5rem; }
+.estado-error p { max-width: 420px; }
+.estado-error .sugerencia { font-size: 0.85rem; }
+.estado-error .btn-secundario { margin-top: 0.4rem; }
+
+/* La receta del día ocupa todo el ancho cuando muestra un error/carga */
+.hero > .estado-error,
+.hero > .cargando { grid-column: 1 / -1; }
+
+/* ---------- NUEVO: Banner sin conexión ---------- */
+#banner-offline {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: #b00020;
+  color: #fff;
+  text-align: center;
+  padding: 0.6rem 1rem;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+/* ---------- NUEVO: Imagen de respaldo ---------- */
+.img-respaldo {
+  background: linear-gradient(135deg, #ffe8d6, #ffd0a8);
+}
+
+/* ---------- NUEVO: Página 404 ---------- */
+.pagina-404 {
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  text-align: center;
+}
+
+.pagina-404 h1 { font-size: 4rem; color: var(--primario); }
+.pagina-404 .icono-grande { font-size: 3rem; }
+.pagina-404 .btn-primario { align-self: center; text-decoration: none; }
