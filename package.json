@@ -1,0 +1,20 @@
+{
+  "name": "recetario",
+  "version": "1.0.0",
+  "description": "Aplicación web de recetas con Node.js, Express y la API de Spoonacular",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": ["recetas", "express", "api"],
+  "author": "David",
+  "license": "ISC",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  }
+}
