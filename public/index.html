@@ -8,16 +8,52 @@
 </head>
 <body>
   <header>
-    <h1>🍳 Recetario</h1>
+    <h1><a href="#" id="logo">🍳 Recetario</a></h1>
+    <p class="subtitulo">Encuentra qué cocinar hoy</p>
+
     <form id="form-busqueda">
-      <input type="text" id="input-busqueda" placeholder="Busca una receta (ej. pasta, pollo, tacos)" required>
+      <input type="text" id="input-busqueda" placeholder="Busca una receta (ej. pasta, pollo, tacos)">
       <button type="submit">Buscar</button>
     </form>
+
+    <!-- NUEVO: botones de categorías -->
+    <nav id="categorias" aria-label="Categorías">
+      <button class="chip" data-categoria="desayunos">🥞 Desayunos</button>
+      <button class="chip" data-categoria="comida">🍝 Comida</button>
+      <button class="chip" data-categoria="cena">🌙 Cena</button>
+      <button class="chip" data-categoria="postres">🍰 Postres</button>
+      <button class="chip" data-categoria="entradas">🥟 Entradas</button>
+      <button class="chip" data-categoria="sopas">🍲 Sopas</button>
+      <button class="chip" data-categoria="ensaladas">🥗 Ensaladas</button>
+      <button class="chip" data-categoria="bebidas">🥤 Bebidas</button>
+      <button class="chip" data-categoria="vegetariano">🥕 Vegetariano</button>
+      <button class="chip" data-categoria="vegano">🌱 Vegano</button>
+      <button class="chip" data-categoria="sin-gluten">🌾 Sin gluten</button>
+    </nav>
   </header>
 
   <main>
-    <p id="mensaje"></p>
-    <section id="resultados" class="grid"></section>
+    <!-- NUEVO: pantalla principal (se oculta al buscar) -->
+    <div id="inicio">
+      <section id="receta-del-dia" class="hero">
+        <p class="cargando">Cargando receta del día...</p>
+      </section>
+
+      <section>
+        <h2 class="titulo-seccion">⭐ Recetas destacadas</h2>
+        <div id="destacadas" class="grid"></div>
+      </section>
+    </div>
+
+    <!-- Resultados de búsqueda / categoría (oculto al inicio) -->
+    <div id="vista-resultados" hidden>
+      <div class="barra-resultados">
+        <h2 id="titulo-resultados" class="titulo-seccion"></h2>
+        <button id="btn-volver" class="btn-secundario">← Volver al inicio</button>
+      </div>
+      <p id="mensaje"></p>
+      <section id="resultados" class="grid"></section>
+    </div>
   </main>
 
   <!-- Modal para el detalle de la receta -->

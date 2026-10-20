@@ -3,3 +3,6 @@ node_modules/
 
 # Variables de entorno (¡nunca subir la API Key!)
 .env
+
+# Copia de la versión anterior
+.respaldo/
