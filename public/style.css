@@ -390,3 +390,64 @@ header { position: relative; }
 .pagina-404 h1 { font-size: 4rem; color: var(--primario); }
 .pagina-404 .icono-grande { font-size: 3rem; }
 .pagina-404 .btn-primario { align-self: center; text-decoration: none; }
+
+/* Esta clase se aplicará al fondo general */
+body.oscuro {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+/* Tarjetas, receta del día y ventana de detalle en modo oscuro */
+body.oscuro .tarjeta,
+body.oscuro .hero,
+body.oscuro dialog {
+    background-color: #1e1e1e;
+    color: #ffffff;
+}
+
+/* Textos secundarios (minutos, porciones, resumen, contador) */
+body.oscuro .tarjeta small,
+body.oscuro .hero .resumen,
+body.oscuro .meta,
+body.oscuro #contador,
+body.oscuro .estado-error,
+body.oscuro .cargando {
+    color: #b3b3b3;
+}
+
+/* Etiqueta de likes sobre la imagen */
+body.oscuro .tarjeta .likes {
+    background: rgba(30, 30, 30, 0.9);
+    color: #ffffff;
+}
+
+/* Botón de cerrar del detalle */
+body.oscuro #cerrar-modal {
+    color: #ffffff;
+}
+
+/* Fondo de imagen de respaldo */
+body.oscuro .img-respaldo {
+    background: linear-gradient(135deg, #2a2a2a, #3a3a3a);
+}
+
+/* ---------- Botón de modo oscuro (debajo del selector de idioma) ---------- */
+#btn-modo-oscuro {
+    position: absolute;
+    top: 3.9rem;
+    right: 1rem;
+    border: none;
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#btn-modo-oscuro:hover { background: rgba(255, 255, 255, 0.35); }
+
+@media (max-width: 700px) {
+    #btn-modo-oscuro { position: static; display: block; margin: 0 auto 1rem; }
+}

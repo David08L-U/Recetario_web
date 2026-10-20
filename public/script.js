@@ -481,3 +481,13 @@ modal.addEventListener('close', () => { recetaAbierta = null; });
 actualizarConexion();
 marcarIdioma();
 cargarInicio();
+
+const btnOscuro = document.getElementById('btn-modo-oscuro');
+btnOscuro.addEventListener('click', () => {
+    document.body.classList.toggle('oscuro');
+    if (document.body.classList.contains('oscuro')) {
+        btnOscuro.textContent = '☀️ Modo Claro';
+    } else {
+        btnOscuro.textContent = '🌙 Modo Oscuro';
+    }
+});

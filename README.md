@@ -1,52 +1,53 @@
 # 🍳 Recetario
 
-Aplicación web para buscar recetas de cocina, hecha con **Node.js** y **Express**. Permite buscar por nombre o por categoría, ver la receta del día y las recetas más populares, y leer cada receta traducida al español.
+Aplicación web para buscar recetas de cocina, desarrollada con **Node.js** y **Express**. Permite buscar recetas por nombre o por categoría, ver la receta del día y las recetas destacadas, cargar más resultados con "Ver más", traducir las recetas al español y cambiar entre modo claro y modo oscuro.
 
-## 🔌 APIs utilizadas
+**APIs externas utilizadas:**
+- **[Spoonacular](https://spoonacular.com/food-api):** fuente de las recetas (búsqueda, categorías, populares y detalle).
+- **[MyMemory](https://mymemory.translated.net/)** / **[DeepL](https://www.deepl.com/pro-api)** (opcional): traducción de las recetas del inglés al español.
 
-| API | Para qué se usa | ¿Requiere key? |
+> 🔒 Las API Keys se guardan en un archivo `.env` y solo las usa el servidor; el navegador nunca las ve.
+
+---
+
+## 🤖 Declaración de uso de herramientas de IA
+
+En este proyecto se utilizaron herramientas de inteligencia artificial como apoyo. A continuación se detalla para qué se usó cada una y cuál fue mi aporte personal.
+
+| Herramienta | Fase | Uso |
 |---|---|---|
-| [Spoonacular](https://spoonacular.com/food-api) | Fuente de todas las recetas: búsqueda, categorías, populares e información detallada (ingredientes y pasos). | ✅ Sí |
-| [MyMemory](https://mymemory.translated.net/doc/spec.php) | Traduce las recetas del inglés al español (traductor por defecto). | ❌ No (opcional: correo para ampliar el límite) |
-| [DeepL API Free](https://www.deepl.com/pro-api) | Traductor alternativo de mejor calidad. Si se configura, reemplaza a MyMemory. | ✅ Sí (opcional) |
+| **Gemini** | Planeación | Utilizado en la fase inicial del proyecto para realizar la planeación, investigar qué API externa gratuita convenía utilizar (Spoonacular) y definir la estructura de carpetas y seguridad del proyecto (`.env`). |
+| **Claude** | Desarrollo | Utilizado para la generación del código fuente. Se encargó de escribir la lógica del servidor en Node.js, las peticiones `fetch` y la estructura base de HTML y CSS. |
 
-> 🔒 **Seguridad:** el navegador nunca habla directo con estas APIs. Todas las peticiones pasan por el servidor de Express, que agrega las claves guardadas en el archivo `.env`. Así las API Keys nunca se exponen en el frontend.
+### 👤 Mi aporte sin IA
 
-## ✨ Funcionalidades
+- Implementación de la funcionalidad de **"Modo Oscuro"**, manipulando directamente el DOM con JavaScript y creando las variables de color en CSS.
+- **Revisión lógica** del código generado.
+- **Ensamblaje** de los archivos del proyecto.
+- **Pruebas** de la interfaz de usuario.
 
-- 🔎 Búsqueda por texto (en español o inglés).
-- 🏷️ Filtros por categoría: desayunos, comida, cena, postres, sopas, vegetariano, vegano, sin gluten y más.
-- ⭐ Receta del día y recetas destacadas en la pantalla principal.
-- ➕ Botón **"Ver más"** que carga 20 recetas adicionales por clic.
-- 🌐 Selector de idioma **ES / EN**.
-- ⚠️ Manejo de errores: sin conexión, servidor apagado, límite de peticiones, 404, respuestas vacías, imágenes rotas, etc.
-- 📱 Diseño adaptable a celular.
+---
 
-## 🛠️ Tecnologías
-
-- **Backend:** Node.js, Express, dotenv
-- **Frontend:** HTML, CSS y JavaScript (sin frameworks)
-
-## 🚀 Cómo ejecutarlo
+## 🚀 Instrucciones de ejecución
 
 ### Requisitos
-- [Node.js](https://nodejs.org/) **versión 18 o superior** (`node -v` para verificar).
+- [Node.js](https://nodejs.org/) **versión 18 o superior** (verifícalo con `node -v`).
 - Una API Key gratuita de [Spoonacular](https://spoonacular.com/food-api/console#Dashboard).
 
 ### Pasos
 
-1. **Clona el repositorio**
+1. **Clonar el repositorio**
    ```bash
    git clone https://github.com/David08L-U/recetario.git
    cd recetario
    ```
 
-2. **Instala las dependencias**
+2. **Instalar las dependencias**
    ```bash
    npm install
    ```
 
-3. **Crea tu archivo `.env`** a partir de la plantilla
+3. **Crear el archivo `.env`** a partir de la plantilla
    ```bash
    # Windows
    copy .env.example .env
@@ -54,7 +55,7 @@ Aplicación web para buscar recetas de cocina, hecha con **Node.js** y **Express
    cp .env.example .env
    ```
 
-4. **Agrega tus claves** en el archivo `.env`
+4. **Agregar las claves** en el archivo `.env`
    ```env
    SPOONACULAR_API_KEY=tu_api_key_de_spoonacular
    PORT=3000
@@ -64,22 +65,22 @@ Aplicación web para buscar recetas de cocina, hecha con **Node.js** y **Express
    DEEPL_API_KEY=
    ```
 
-5. **Inicia el servidor**
+5. **Iniciar el servidor**
    ```bash
    npm run dev     # modo desarrollo (se reinicia al guardar cambios)
    # o
    npm start
    ```
 
-6. **Abre la app** en tu navegador: 👉 [http://localhost:3000](http://localhost:3000)
+6. **Abrir la aplicación** en el navegador: 👉 [http://localhost:3000](http://localhost:3000)
 
-## 📁 Estructura del proyecto
+### Estructura del proyecto
 
 ```
 recetario/
 ├── public/
 │   ├── index.html      # Página principal
-│   ├── style.css       # Estilos
+│   ├── style.css       # Estilos (incluye variables de color del modo oscuro)
 │   ├── script.js       # Lógica del frontend
 │   └── 404.html        # Página de "no encontrado"
 ├── server.js           # Servidor Express (protege las API Keys)
@@ -88,22 +89,10 @@ recetario/
 └── .gitignore          # Ignora .env y node_modules
 ```
 
-## 📡 Endpoints del servidor
+> ⚠️ **Planes gratuitos:** Spoonacular permite 150 puntos al día y MyMemory ~5,000 caracteres al día (~50,000 si configuras `MYMEMORY_EMAIL`). Si se agotan, la app muestra un aviso.
 
-| Método | Ruta | Descripción |
-|---|---|---|
-| GET | `/api/inicio?lang=es` | Receta del día y recetas destacadas |
-| GET | `/api/recetas?q=pollo&lang=es` | Búsqueda por texto |
-| GET | `/api/recetas?categoria=postres&offset=20` | Búsqueda por categoría (con paginación) |
-| GET | `/api/recetas/:id?lang=es` | Detalle de una receta |
-
-## ⚠️ Límites de los planes gratuitos
-
-- **Spoonacular:** 150 puntos al día. Si se agotan, la app muestra un aviso y se reinicia al día siguiente.
-- **MyMemory:** ~5,000 caracteres al día sin correo, ~50,000 con `MYMEMORY_EMAIL`.
-- **DeepL Free:** 500,000 caracteres al mes.
-
-Para ahorrar peticiones, el servidor guarda en memoria la pantalla principal del día y las traducciones ya hechas.
+---
 
 ## 👤 Autor
+
 **David** — Proyecto escolar de la materia de Desarrollo Web.
