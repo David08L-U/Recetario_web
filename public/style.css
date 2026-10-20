@@ -262,3 +262,77 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.5); }
   #categorias { flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; padding-bottom: 0.4rem; }
   .chip { flex-shrink: 0; }
 }
+
+/* ---------- NUEVO: Selector de idioma ---------- */
+header { position: relative; }
+
+.idioma {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  padding: 3px;
+}
+
+.idioma button {
+  border: none;
+  background: transparent;
+  color: #fff;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.idioma button.activo {
+  background: #fff;
+  color: var(--primario);
+}
+
+/* ---------- NUEVO: Paginación ---------- */
+.paginacion {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  margin: 2.5rem 0 1rem;
+}
+
+#contador { color: var(--texto-suave); font-size: 0.9rem; }
+
+.paginacion .btn-primario { align-self: center; min-width: 200px; }
+.btn-primario:disabled { opacity: 0.6; cursor: wait; }
+
+/* ---------- NUEVO: Aviso flotante ---------- */
+#toast {
+  position: fixed;
+  left: 50%;
+  bottom: 1.5rem;
+  transform: translate(-50%, 1rem);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  max-width: min(90vw, 480px);
+  background: var(--texto);
+  color: #fff;
+  padding: 0.75rem 1.2rem;
+  border-radius: 10px;
+  box-shadow: var(--sombra-fuerte);
+  font-size: 0.9rem;
+  text-align: center;
+  transition: transform 0.3s, opacity 0.3s, visibility 0.3s;
+  z-index: 10;
+}
+
+#toast.visible {
+  transform: translate(-50%, 0);
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (max-width: 700px) {
+  .idioma { position: static; justify-content: center; width: max-content; margin: 0 auto 1rem; }
+}

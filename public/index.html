@@ -8,6 +8,12 @@
 </head>
 <body>
   <header>
+    <!-- NUEVO: selector de idioma -->
+    <div class="idioma" role="group" aria-label="Idioma de las recetas">
+      <button type="button" data-idioma="es">🇲🇽 ES</button>
+      <button type="button" data-idioma="en">🇺🇸 EN</button>
+    </div>
+
     <h1><a href="#" id="logo">🍳 Recetario</a></h1>
     <p class="subtitulo">Encuentra qué cocinar hoy</p>
 
@@ -53,6 +59,12 @@
       </div>
       <p id="mensaje"></p>
       <section id="resultados" class="grid"></section>
+
+      <!-- NUEVO: paginación -->
+      <div class="paginacion">
+        <p id="contador"></p>
+        <button id="btn-ver-mas" class="btn-primario" hidden>Ver más recetas</button>
+      </div>
     </div>
   </main>
 
@@ -61,6 +73,9 @@
     <button id="cerrar-modal" aria-label="Cerrar">✕</button>
     <div id="detalle"></div>
   </dialog>
+
+  <!-- NUEVO: avisos flotantes -->
+  <div id="toast" role="status" aria-live="polite"></div>
 
   <script src="script.js"></script>
 </body>

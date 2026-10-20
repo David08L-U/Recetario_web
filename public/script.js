@@ -3,6 +3,7 @@ const form = document.getElementById('form-busqueda');
 const input = document.getElementById('input-busqueda');
 const logo = document.getElementById('logo');
 const chips = document.querySelectorAll('.chip');
+const botonesIdioma = document.querySelectorAll('.idioma button');
 
 const vistaInicio = document.getElementById('inicio');
 const recetaDelDia = document.getElementById('receta-del-dia');
@@ -13,13 +14,29 @@ const tituloResultados = document.getElementById('titulo-resultados');
 const btnVolver = document.getElementById('btn-volver');
 const resultados = document.getElementById('resultados');
 const mensaje = document.getElementById('mensaje');
+const contador = document.getElementById('contador');
+const btnVerMas = document.getElementById('btn-ver-mas');
 
 const modal = document.getElementById('modal');
 const detalle = document.getElementById('detalle');
 const cerrarModal = document.getElementById('cerrar-modal');
+const toast = document.getElementById('toast');
 
 // El navegador llama a NUESTRO servidor, nunca directo a la API externa.
 // Así la API Key nunca llega al frontend.
+
+// ---------------------------------------------------------------
+// Estado de la app
+// ---------------------------------------------------------------
+let idioma = leerIdioma();           // 'es' o 'en'
+let recetaAbierta = null;            // id de la receta en el modal
+const busqueda = {                   // búsqueda actual (para "Ver más")
+  params: null,
+  titulo: '',
+  offset: 0,
+  total: 0,
+  cargando: false
+};
 
 // Evita que texto de la API se interprete como HTML
 function escapar(texto = '') {
@@ -27,6 +44,51 @@ function escapar(texto = '') {
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
   }[c]));
 }
+
+// Aviso flotante que desaparece solo
+let temporizadorToast;
+function mostrarAviso(texto) {
+  if (!texto) return;
+  toast.textContent = texto;
+  toast.classList.add('visible');
+  clearTimeout(temporizadorToast);
+  temporizadorToast = setTimeout(() => toast.classList.remove('visible'), 5000);
+}
+
+// Pide JSON a nuestro servidor agregando el idioma
+async function pedir(ruta, params = {}) {
+  const url = ruta + '?' + new URLSearchParams({ ...params, lang: idioma });
+  const res = await fetch(url);
+  const datos = await res.json();
+  if (!res.ok) throw new Error(datos.error);
+  mostrarAviso(datos.aviso);
+  return datos;
+}
+
+// ---------------------------------------------------------------
+// NUEVO: Idioma (ES / EN), se recuerda en el navegador
+// ---------------------------------------------------------------
+function leerIdioma() {
+  try { return localStorage.getItem('idioma') || 'es'; } catch { return 'es'; }
+}
+
+function marcarIdioma() {
+  botonesIdioma.forEach((b) => b.classList.toggle('activo', b.dataset.idioma === idioma));
+}
+
+botonesIdioma.forEach((boton) => {
+  boton.addEventListener('click', () => {
+    if (boton.dataset.idioma === idioma) return;
+    idioma = boton.dataset.idioma;
+    try { localStorage.setItem('idioma', idioma); } catch {}
+    marcarIdioma();
+
+    // Recargar lo que se está viendo en el nuevo idioma
+    if (!vistaResultados.hidden && busqueda.params) buscar(busqueda.params, busqueda.titulo);
+    else cargarInicio();
+    if (modal.open && recetaAbierta) verDetalle(recetaAbierta);
+  });
+});
 
 // ---------------------------------------------------------------
 // Cambiar entre pantalla principal y resultados
@@ -52,16 +114,14 @@ logo.addEventListener('click', (e) => { e.preventDefault(); mostrarInicio(); });
 btnVolver.addEventListener('click', mostrarInicio);
 
 // ---------------------------------------------------------------
-// NUEVO: Pantalla principal (receta del día + destacadas)
+// Pantalla principal (receta del día + destacadas)
 // ---------------------------------------------------------------
 async function cargarInicio() {
+  recetaDelDia.innerHTML = `<p class="cargando">${idioma === 'es' ? 'Cargando y traduciendo...' : 'Cargando...'}</p>`;
+  destacadas.innerHTML = '';
   try {
-    const res = await fetch('/api/inicio');
-    const datos = await res.json();
-    if (!res.ok) throw new Error(datos.error);
-
+    const datos = await pedir('/api/inicio');
     pintarRecetaDelDia(datos.delDia);
-    destacadas.innerHTML = '';
     datos.destacadas.forEach((r) => destacadas.appendChild(crearTarjeta(r)));
   } catch (err) {
     recetaDelDia.innerHTML = `<p class="cargando">${escapar(err.message || 'No se pudo cargar la pantalla principal')}</p>`;
@@ -83,7 +143,7 @@ function pintarRecetaDelDia(r) {
 }
 
 // ---------------------------------------------------------------
-// Búsqueda por texto y por categoría (usan la misma función)
+// Búsqueda por texto y por categoría
 // ---------------------------------------------------------------
 form.addEventListener('submit', (e) => {
   e.preventDefault();
@@ -93,7 +153,6 @@ form.addEventListener('submit', (e) => {
   buscar({ q }, `Resultados para "${q}"`);
 });
 
-// NUEVO: clic en un botón de categoría
 chips.forEach((chip) => {
   chip.addEventListener('click', () => {
     const categoria = chip.dataset.categoria;
@@ -103,26 +162,58 @@ chips.forEach((chip) => {
   });
 });
 
+// Búsqueda nueva: limpia todo y carga la primera página
 async function buscar(params, titulo) {
+  Object.assign(busqueda, { params, titulo, offset: 0, total: 0 });
   mostrarVistaResultados(titulo);
-  mensaje.textContent = 'Buscando...';
   resultados.innerHTML = '';
+  contador.textContent = '';
+  btnVerMas.hidden = true;
+  mensaje.textContent = 'Buscando...';
+  await cargarPagina();
+}
+
+// NUEVO: carga las siguientes 20 recetas y las agrega abajo
+async function cargarPagina() {
+  if (busqueda.cargando) return;
+  busqueda.cargando = true;
+  btnVerMas.disabled = true;
+  btnVerMas.textContent = 'Cargando...';
+  const paramsActuales = busqueda.params;
 
   try {
-    const res = await fetch('/api/recetas?' + new URLSearchParams(params));
-    const datos = await res.json();
-    if (!res.ok) throw new Error(datos.error);
+    const datos = await pedir('/api/recetas', { ...paramsActuales, offset: busqueda.offset });
+    if (paramsActuales !== busqueda.params) return; // el usuario ya buscó otra cosa
 
-    if (datos.length === 0) {
+    busqueda.total = datos.total;
+    busqueda.offset += datos.recetas.length;
+
+    if (busqueda.offset === 0) {
       mensaje.textContent = 'No se encontraron recetas 😕';
       return;
     }
     mensaje.textContent = '';
-    datos.forEach((r) => resultados.appendChild(crearTarjeta(r)));
+    datos.recetas.forEach((r) => resultados.appendChild(crearTarjeta(r)));
+    actualizarPaginacion(datos.recetas.length);
   } catch (err) {
-    mensaje.textContent = err.message || 'Ocurrió un error';
+    if (busqueda.offset === 0) mensaje.textContent = err.message || 'Ocurrió un error';
+    else mostrarAviso(err.message || 'No se pudieron cargar más recetas');
+  } finally {
+    busqueda.cargando = false;
+    btnVerMas.disabled = false;
+    btnVerMas.textContent = 'Ver más recetas';
   }
 }
+
+function actualizarPaginacion(recibidas) {
+  const hayMas = recibidas > 0 && busqueda.offset < busqueda.total;
+  contador.textContent = hayMas
+    ? `Mostrando ${busqueda.offset} de ${busqueda.total} recetas`
+    : `Mostrando las ${busqueda.offset} recetas encontradas 🎉`;
+  btnVerMas.hidden = !hayMas;
+}
+
+btnVerMas.addEventListener('click', cargarPagina);
 
 // Tarjeta reutilizable (destacadas y resultados)
 function crearTarjeta(r) {
@@ -144,13 +235,13 @@ function crearTarjeta(r) {
 // Detalle en el modal
 // ---------------------------------------------------------------
 async function verDetalle(id) {
-  detalle.innerHTML = '<p>Cargando...</p>';
-  modal.showModal();
+  recetaAbierta = id;
+  detalle.innerHTML = `<p>${idioma === 'es' ? 'Cargando y traduciendo...' : 'Cargando...'}</p>`;
+  if (!modal.open) modal.showModal();
 
   try {
-    const res = await fetch(`/api/recetas/${id}`);
-    const r = await res.json();
-    if (!res.ok) throw new Error(r.error);
+    const r = await pedir(`/api/recetas/${id}`);
+    if (recetaAbierta !== id) return;
 
     detalle.innerHTML = `
       <h2>${escapar(r.titulo)}</h2>
@@ -169,8 +260,9 @@ async function verDetalle(id) {
 }
 
 cerrarModal.addEventListener('click', () => modal.close());
-// Cerrar el modal al hacer clic fuera de él
 modal.addEventListener('click', (e) => { if (e.target === modal) modal.close(); });
+modal.addEventListener('close', () => { recetaAbierta = null; });
 
 // Arranque
+marcarIdioma();
 cargarInicio();
